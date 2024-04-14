@@ -4,12 +4,14 @@
   "license": "(MIT AND Apache-2.0)",
   "type": "module",
   "scripts": {
-    "build": "near-sdk-js build src/contract.ts build/hello_near.wasm",
-    "test": "$npm_execpath run build && ava -- ./build/hello_near.wasm"
+    "build": "near-sdk-js build src/contract.ts build/verifier-contract.wasm",
+    "test": "$npm_execpath run build && ava -- ./build/verifier-contract.wasm"
   },
   "dependencies": {
     "near-cli": "^4.0.8",
-    "near-sdk-js": "1.0.0"
+    "near-sdk-js": "1.0.0",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1"
   },
   "devDependencies": {
     "@ava/typescript": "^4.1.0",
