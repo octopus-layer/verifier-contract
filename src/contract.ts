@@ -6,6 +6,7 @@ import {
   UnorderedMap
 } from 'near-sdk-js';
 
+import { verify } from '../utils/signature';
 
 @NearBindgen({})
 class VerifierContract {
@@ -15,8 +16,8 @@ class VerifierContract {
 
   @call({})
   deployContract(
-    node_keys: string[], // Initial set of node public keys
-    node_urls: string[] // Initial set of node URLs
+    node_keys: string[],
+    node_urls: string[]
   ): void {
     if (node_keys.length != node_urls.length)
       throw Error('Error: Node keys and URLs do not match.');
@@ -31,6 +32,11 @@ class VerifierContract {
     this.node_count = node_keys.length;
   };
 
+  @view({})
+  getNodeKeys(): Uint8Array {
+    return this.node_keys.serialize();
+  };
+
   @call({})
   updateURL(
     public_key: string,
@@ -40,7 +46,8 @@ class VerifierContract {
     if (!this.node_keys.contains(public_key))
       throw Error('Error: Node does not exist.');
 
-    // TO DO: signature verification
+    if (!verify(new_url, signature, public_key))
+      throw Error('Error: Signature is not valid.');
 
     this.node_urls.set(public_key, new_url);
   };
@@ -64,10 +71,11 @@ class VerifierContract {
       if (!this.node_keys.contains(public_key))
         throw Error('Error: Signature is not valid.');
 
-      // TO DO: signature verification
+      if (!verify(public_key + url, signature, public_key))
+        throw Error('Error: Signature is not valid.');
     }
 
     this.node_keys.set(public_key);
     this.node_urls.set(public_key, url);
-  }
-}
+  };
+};
